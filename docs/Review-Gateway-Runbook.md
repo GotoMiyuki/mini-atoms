@@ -1,6 +1,6 @@
 # 受控评审入口（公开副本）
 
-已验证链路：固定 HTTPS Tunnel → loopback TLS Basic Gateway → 原 Main → 原 Preview。Demo 为 https://demo.mini-atoms.win，默认拒绝；凭据不随仓库分发。
+已验证链路：固定 HTTPS Tunnel → loopback TLS Basic Gateway → 原 Main → 原 Preview。Demo 为 https://demo.mini-atoms.win ，默认拒绝；凭据不随仓库分发。
 
 实现见 apps/builder/src/review-gateway，服务模板见 apps/builder/deploy/linux/mini-atoms-review.service.template。TLS 密钥、受控 CA、Tunnel token、owner token、manifest、grant 及 Provider 配置均属于私有部署材料。
 
