@@ -1,0 +1,39 @@
+[Unit]
+Description=Mini Atoms Human-only review gateway (boot closed; explicit mode)
+After=mini-atoms-b1.service
+StartLimitIntervalSec=120
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=mini-atoms-review
+Group=mini-atoms-review
+WorkingDirectory=/opt/mini-atoms-review/current/apps/builder
+EnvironmentFile=/opt/mini-atoms-review/config/gateway.env
+Environment=M1_REVIEW_CONFIG_ROOT=/opt/mini-atoms-review/config
+Environment=M1_REVIEW_CONTROL=/run/mini-atoms-review/control.sock
+Environment=M1_REVIEW_PORT=18449
+ExecStart=/opt/mini-atoms-review/node24/bin/node src/review-gateway/main.mjs
+RuntimeDirectory=mini-atoms-review
+RuntimeDirectoryMode=0700
+RuntimeDirectoryPreserve=no
+UMask=0077
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=15
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+RestrictAddressFamilies=AF_UNIX AF_INET
+IPAddressDeny=any
+IPAddressAllow=localhost
+MemoryHigh=192M
+MemoryMax=256M
+TasksMax=32
+CPUQuota=50%
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

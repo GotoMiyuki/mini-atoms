@@ -1,0 +1,82 @@
+name: mini-atoms-m05
+x-runtime: &runtime
+  image: mini-atoms-m05:local
+  init: true
+  user: "1001:1001"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  pids_limit: 192
+  mem_limit: 1024m
+  cpus: 1.0
+  tmpfs:
+    - /tmp:rw,nosuid,nodev,size=256m
+services:
+  compiler:
+    <<: *runtime
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    network_mode: none
+    mem_limit: 512m
+    command: [node, src/spike-cli/build-fixtures.mjs]
+    volumes:
+      - ../artifacts:/app/artifacts
+      - ../evidence:/app/evidence
+  preview:
+    <<: *runtime
+    mem_limit: 192m
+    pids_limit: 48
+    cpus: 0.5
+    command: [node, src/static-preview/server.mjs]
+    volumes:
+      - ../artifacts:/app/artifacts:ro
+    ports: ["127.0.0.1:8091:8080"]
+    networks: [browser, presentation]
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:8080/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  main-canary:
+    <<: *runtime
+    mem_limit: 128m
+    pids_limit: 32
+    cpus: 0.25
+    command: [node, src/static-preview/server.mjs]
+    environment:
+      SERVER_ROLE: main-canary
+    networks:
+      control:
+        ipv4_address: 172.30.245.2
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:8080/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  validator:
+    <<: *runtime
+    dns: [127.0.0.1]
+    security_opt:
+      - no-new-privileges:true
+      - seccomp=./seccomp-profile.json
+    shm_size: 256m
+    command: [node, src/validator/worker.mjs]
+    volumes:
+      - ../artifacts:/app/artifacts:ro
+      - ${M05_JOB_FILE:-../jobs/job.json}:/jobs/job.json:ro
+      - ${M05_OUTPUT_DIR:-../evidence/worker-output}:/evidence
+    networks: [browser]
+networks:
+  browser:
+    internal: true
+    driver_opts:
+      com.docker.network.bridge.gateway_mode_ipv4: isolated
+  presentation:
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+  control:
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.30.245.0/24

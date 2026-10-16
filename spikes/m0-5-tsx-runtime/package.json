@@ -1,0 +1,22 @@
+{
+  "name": "mini-atoms-m0-5-tsx-runtime",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "test:build": "node tests/build.spec.mjs",
+    "build:fixtures": "node src/spike-cli/build-fixtures.mjs",
+    "test:browser": "node src/spike-cli/run.mjs --gate t2",
+    "test:security": "node src/spike-cli/run.mjs --gate t3",
+    "test:resources": "node src/spike-cli/run.mjs --gate resources",
+    "preview": "node src/static-preview/server.mjs"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "esbuild": "0.28.2",
+    "typescript": "6.0.3",
+    "@playwright/test": "1.64.0"
+  }
+}

@@ -1,0 +1,2 @@
+# Preserve the byte identity of frozen source, runtime locks and templates.
+* -text

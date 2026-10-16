@@ -1,0 +1,16 @@
+# Only transport/storage adapters. Security settings come from the original
+# M0.5 Compose file; never copy/recreate its compiler/preview boundaries here.
+services:
+  compiler:
+    image: ${M1_RUNTIME_IMAGE:?Pinned M0.5 image required}
+    volumes:
+      - ${M1_BUILD_OUTPUT:?Per-job output required}:/app/artifacts
+      - ${M1_BUILD_LOGS:?Per-job logs required}:/app/evidence
+      - ${M1_SOURCE_FILE:?Per-job source required}:/input/source.json:ro
+    command: [node, src/spike-cli/compile-input.mjs, /input/source.json]
+  preview:
+    image: ${M1_RUNTIME_IMAGE:?Pinned M0.5 image required}
+    restart: unless-stopped
+    volumes:
+      - ${M1_ARTIFACTS_ROOT:?Published immutable artifacts required}:/app/artifacts:ro
+    ports: !override ["127.0.0.1:8092:8080"]

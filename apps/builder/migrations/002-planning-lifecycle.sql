@@ -1,0 +1,25 @@
+BEGIN IMMEDIATE;
+-- Existing tables/rows/triggers stay intact, including the original Job enums.
+CREATE TABLE job_context(job_id TEXT PRIMARY KEY REFERENCES job_records(id), task TEXT NOT NULL CHECK(task IN ('SPECIFY','GENERATE','PLAN'))) STRICT;
+CREATE TABLE job_outcomes(job_id TEXT PRIMARY KEY REFERENCES job_records(id), document TEXT NOT NULL CHECK(json_valid(document))) STRICT;
+CREATE TABLE model_call_slots(id TEXT PRIMARY KEY, job_id TEXT REFERENCES job_records(id), attempt INTEGER NOT NULL CHECK(attempt BETWEEN 1 AND 2), created_at TEXT NOT NULL, origin TEXT NOT NULL, UNIQUE(job_id,attempt)) STRICT;
+INSERT INTO model_call_slots SELECT 'legacy:'||id,id,1,created_at,'Legacy M1 job; conservative reservation' FROM job_records;
+CREATE TABLE model_call_results(slot_id TEXT PRIMARY KEY REFERENCES model_call_slots(id), document TEXT NOT NULL CHECK(json_valid(document))) STRICT;
+CREATE TABLE spec_provenance(spec_id TEXT PRIMARY KEY REFERENCES specifications(id), source_job_id TEXT REFERENCES job_records(id), document TEXT NOT NULL CHECK(json_valid(document))) STRICT;
+CREATE TABLE version_test_plans(id TEXT PRIMARY KEY, spec_id TEXT NOT NULL REFERENCES specifications(id), version_id TEXT NOT NULL REFERENCES app_versions(id), document TEXT NOT NULL CHECK(json_valid(document))) STRICT;
+CREATE TABLE planning_attempts(id TEXT PRIMARY KEY, version_id TEXT NOT NULL REFERENCES app_versions(id), spec_id TEXT NOT NULL REFERENCES specifications(id), job_id TEXT REFERENCES job_records(id), document TEXT NOT NULL CHECK(json_valid(document))) STRICT;
+CREATE UNIQUE INDEX one_planning_outcome_per_job ON planning_attempts(job_id) WHERE job_id IS NOT NULL;
+CREATE INDEX planning_by_version ON planning_attempts(version_id);
+CREATE TRIGGER immutable_job_context BEFORE UPDATE ON job_context BEGIN SELECT RAISE(ABORT,'Job context is immutable'); END;
+CREATE TRIGGER immutable_job_outcomes BEFORE UPDATE ON job_outcomes BEGIN SELECT RAISE(ABORT,'Job outcome is immutable'); END;
+CREATE TRIGGER immutable_call_slot BEFORE UPDATE ON model_call_slots BEGIN SELECT RAISE(ABORT,'Call reservations are immutable'); END;
+CREATE TRIGGER immutable_call_result BEFORE UPDATE ON model_call_results BEGIN SELECT RAISE(ABORT,'Call audit is immutable'); END;
+CREATE TRIGGER immutable_spec_provenance BEFORE UPDATE ON spec_provenance BEGIN SELECT RAISE(ABORT,'Spec provenance is immutable'); END;
+CREATE TRIGGER immutable_version_plan BEFORE UPDATE ON version_test_plans BEGIN SELECT RAISE(ABORT,'Version TestPlan is immutable'); END;
+CREATE TRIGGER immutable_planning_attempt BEFORE UPDATE ON planning_attempts BEGIN SELECT RAISE(ABORT,'Planning attempt is immutable'); END;
+CREATE TRIGGER no_delete_call_slot BEFORE DELETE ON model_call_slots BEGIN SELECT RAISE(ABORT,'Call reservations are immutable'); END;
+CREATE TRIGGER no_delete_call_result BEFORE DELETE ON model_call_results BEGIN SELECT RAISE(ABORT,'Call audit is immutable'); END;
+CREATE TRIGGER no_delete_version_plan BEFORE DELETE ON version_test_plans BEGIN SELECT RAISE(ABORT,'Version TestPlan is immutable'); END;
+CREATE TRIGGER no_delete_planning_attempt BEFORE DELETE ON planning_attempts BEGIN SELECT RAISE(ABORT,'Planning attempt is immutable'); END;
+PRAGMA user_version=2;
+COMMIT;

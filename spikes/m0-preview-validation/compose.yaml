@@ -1,0 +1,19 @@
+services:
+  spike:
+    build: .
+    image: mini-atoms-m0:local
+    init: true
+    ports:
+      - "127.0.0.1:8080:8080"
+    shm_size: "1gb"
+    environment:
+      TEST_ENVIRONMENT: local-docker
+      M0_RUN_TOKEN: ${M0_RUN_TOKEN:-}
+    volumes:
+      - ./evidence:/app/evidence
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 3

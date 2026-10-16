@@ -1,0 +1,17 @@
+{
+  "src/shared.mjs": "6cbea67834a44434f03840eaeb475bd5ab09377778454307060040c0ed917295",
+  "src/validator/worker.mjs": "0b1b52fe95db5a529b315b0d337e4c3b58175c55619458e3757d0136693e9e37",
+  "src/validator/plans.mjs": "caac240f627b8768a4536880303e48427891990ffe149f2a586b09ec39744f65",
+  "src/validator/network-probe.mjs": "076a1b5d6d983220f2ad610ffc47ee057a6e8a2edc30bcfac322568111ccfa3f",
+  "src/validator/static-loopback.mjs": "0c0cbc5b9d2b46792b915b5a7770251edceaa3d283c71a96d892246a3f2a8994",
+  "src/static-preview/server.mjs": "9dbf1c0251d6cd9ad7af7d7be06e91d91f818f2b9bd1b5d6a627ffcdcffa1d79",
+  "src/spike-cli/run.mjs": "3a0c60027a256c5d24a72ca997b09326cefce41052bf8c5727723a0141931217",
+  "src/spike-cli/fixtures.mjs": "db9ff3c62a07e9be0c44c179a94ed5b49c87f85f35d62b1aa4e5f7b25bbec0b1",
+  "src/spike-cli/build-fixtures.mjs": "ab265a4abf46161c7f2c98eb0029d446437b75fddd663b65cac8fdfb05462405",
+  "src/controlled-build/index.mjs": "4394e5bf7cc0df9161e2d3bd1f00815cc9a594127e45a8d27d4ec8f2036ab306",
+  "src/controlled-build/compile-child.mjs": "11e6870e1347f8d00df7aacc5bedafb9a9e440fa33dd95c9d02b504e5a6e8835",
+  "src/controlled-build/inspect-imports.mjs": "77d649b45a82b078681b33cdbd20f71e8b694fa43d03735702c5e20e6e555e95",
+  "src/controlled-build/policy.mjs": "6f85f30d5f10018340f711ad51f442ec67dc2470953513fe39198126d7922611",
+  "deploy/seccomp-profile.json": "48df36b1304eb04d57f2fdf6fb61c68bb6be8fe6ac1efe80d2336e8dedd38e31",
+  "package-lock.json": "1f676abc7c93023bed4d71e54b7c4756414313a269bfee45495f00f8b33f5d9c"
+}

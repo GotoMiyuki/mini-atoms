@@ -1,0 +1,35 @@
+{
+  "name": "mini-atoms-builder",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.19.0 <25"
+  },
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "start": "node --env-file-if-exists=.env.local src/server/main.ts",
+    "test": "node --test --test-concurrency=1 tests/*.test.ts",
+    "runtime:up": "node src/server/runtime-cli.ts up",
+    "runtime:down": "node src/server/runtime-cli.ts down",
+    "runtime:check": "node src/server/runtime-cli.ts check",
+    "setup": "node scripts/setup.mjs",
+    "test:integration": "node tests/integration.ts",
+    "test:runtime": "node tests/runtime-integration.ts",
+    "test:restore": "node tests/integration.ts --restore",
+    "test:evidence": "node tests/verify-evidence.ts"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "6.0.3",
+    "playwright-core": "1.64.0"
+  },
+  "devDependencies": {
+    "vite": "8.3.4",
+    "@playwright/test": "1.64.0",
+    "@types/node": "24.10.0",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2"
+  }
+}

@@ -1,0 +1,7 @@
+# Input/output transport only. All permissions, DNS, seccomp and network
+# settings remain inherited from the frozen M0.5 validator service.
+services:
+  validator:
+    image: ${M1_RUNTIME_IMAGE:?Pinned M0.5 image required}
+    volumes:
+      - ${M2_INBOX_ARTIFACTS:?Private per-requirement manifest required}:/app/artifacts:ro

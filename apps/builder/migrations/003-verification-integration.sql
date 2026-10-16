@@ -1,0 +1,21 @@
+BEGIN IMMEDIATE;
+-- Keep all v1/v2 tables, columns, constraints, and rows unchanged.
+CREATE TABLE verification_jobs(job_id TEXT PRIMARY KEY REFERENCES job_records(id),run_id TEXT NOT NULL UNIQUE REFERENCES verification_runs(id)) STRICT;
+CREATE TABLE verification_bindings(run_id TEXT PRIMARY KEY REFERENCES verification_runs(id),spec_id TEXT NOT NULL REFERENCES specifications(id),version_id TEXT NOT NULL REFERENCES app_versions(id),plan_id TEXT NOT NULL REFERENCES version_test_plans(id)) STRICT;
+CREATE TABLE evidence_metadata(evidence_id TEXT PRIMARY KEY REFERENCES evidence_files(id),requirement_id TEXT,bytes INTEGER NOT NULL CHECK(bytes>=0),created_at TEXT NOT NULL) STRICT;
+CREATE UNIQUE INDEX result_per_requirement ON requirement_results(run_id,requirement_id);
+CREATE INDEX verification_version ON verification_runs(app_version_id);
+CREATE TRIGGER immutable_verification_job BEFORE UPDATE ON verification_jobs BEGIN SELECT RAISE(ABORT,'Verification job identity is immutable'); END;
+CREATE TRIGGER immutable_verification_binding BEFORE UPDATE ON verification_bindings BEGIN SELECT RAISE(ABORT,'Verification binding is immutable'); END;
+CREATE TRIGGER immutable_terminal_run BEFORE UPDATE ON verification_runs WHEN json_extract(OLD.document,'$.state') IN ('COMPLETED','ERROR','CANCELLED') BEGIN SELECT RAISE(ABORT,'Terminal verification runs are immutable'); END;
+CREATE TRIGGER immutable_requirement_result BEFORE UPDATE ON requirement_results BEGIN SELECT RAISE(ABORT,'Requirement results are immutable'); END;
+CREATE TRIGGER immutable_evidence BEFORE UPDATE ON evidence_files BEGIN SELECT RAISE(ABORT,'Registered evidence is immutable'); END;
+CREATE TRIGGER immutable_evidence_metadata BEFORE UPDATE ON evidence_metadata BEGIN SELECT RAISE(ABORT,'Evidence metadata is immutable'); END;
+CREATE TRIGGER no_delete_run BEFORE DELETE ON verification_runs BEGIN SELECT RAISE(ABORT,'Referenced verification history is protected'); END;
+CREATE TRIGGER no_delete_requirement_result BEFORE DELETE ON requirement_results BEGIN SELECT RAISE(ABORT,'Verification history is protected'); END;
+CREATE TRIGGER no_delete_evidence BEFORE DELETE ON evidence_files BEGIN SELECT RAISE(ABORT,'Referenced evidence is protected'); END;
+CREATE TRIGGER no_delete_evidence_metadata BEFORE DELETE ON evidence_metadata BEGIN SELECT RAISE(ABORT,'Referenced evidence metadata is protected'); END;
+CREATE TRIGGER no_delete_verification_binding BEFORE DELETE ON verification_bindings BEGIN SELECT RAISE(ABORT,'Verification binding is protected'); END;
+CREATE TRIGGER no_delete_verification_job BEFORE DELETE ON verification_jobs BEGIN SELECT RAISE(ABORT,'Verification job identity is protected'); END;
+PRAGMA user_version=3;
+COMMIT;

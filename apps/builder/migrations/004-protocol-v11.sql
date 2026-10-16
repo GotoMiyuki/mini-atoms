@@ -1,0 +1,18 @@
+BEGIN IMMEDIATE;
+CREATE TABLE v11_plan_records(id TEXT PRIMARY KEY,version_id TEXT NOT NULL REFERENCES app_versions(id),spec_id TEXT NOT NULL REFERENCES specifications(id),job_id TEXT REFERENCES job_records(id),document TEXT NOT NULL) STRICT;
+CREATE TABLE v11_inventories(plan_id TEXT PRIMARY KEY REFERENCES v11_plan_records(id),document TEXT NOT NULL) STRICT;
+CREATE TABLE v11_authorizations(id TEXT PRIMARY KEY,plan_id TEXT NOT NULL UNIQUE REFERENCES v11_plan_records(id),document TEXT NOT NULL) STRICT;
+CREATE TABLE v11_run_bindings(run_id TEXT PRIMARY KEY REFERENCES verification_runs(id),plan_id TEXT NOT NULL REFERENCES v11_plan_records(id),authorization_id TEXT NOT NULL REFERENCES v11_authorizations(id),document TEXT NOT NULL) STRICT;
+CREATE TABLE verification_protocol_selections(id TEXT PRIMARY KEY,version_id TEXT NOT NULL REFERENCES app_versions(id),protocol_version TEXT NOT NULL CHECK(protocol_version IN ('0.1','1.1')),job_id TEXT REFERENCES job_records(id)) STRICT;
+CREATE TRIGGER immutable_v11_plan BEFORE UPDATE ON v11_plan_records BEGIN SELECT RAISE(ABORT,'v1.1 proposal is immutable'); END;
+CREATE TRIGGER no_delete_v11_plan BEFORE DELETE ON v11_plan_records BEGIN SELECT RAISE(ABORT,'v1.1 proposal is protected'); END;
+CREATE TRIGGER immutable_v11_inventory BEFORE UPDATE ON v11_inventories BEGIN SELECT RAISE(ABORT,'v1.1 inventory is immutable'); END;
+CREATE TRIGGER no_delete_v11_inventory BEFORE DELETE ON v11_inventories BEGIN SELECT RAISE(ABORT,'v1.1 inventory is protected'); END;
+CREATE TRIGGER immutable_v11_auth BEFORE UPDATE ON v11_authorizations BEGIN SELECT RAISE(ABORT,'Authorization is immutable'); END;
+CREATE TRIGGER no_delete_v11_auth BEFORE DELETE ON v11_authorizations BEGIN SELECT RAISE(ABORT,'Authorization is protected'); END;
+CREATE TRIGGER immutable_v11_binding BEFORE UPDATE ON v11_run_bindings BEGIN SELECT RAISE(ABORT,'Authorization binding is immutable'); END;
+CREATE TRIGGER no_delete_v11_binding BEFORE DELETE ON v11_run_bindings BEGIN SELECT RAISE(ABORT,'Authorization binding is protected'); END;
+CREATE TRIGGER immutable_protocol_selection BEFORE UPDATE ON verification_protocol_selections BEGIN SELECT RAISE(ABORT,'Protocol selection is immutable'); END;
+CREATE TRIGGER no_delete_protocol_selection BEFORE DELETE ON verification_protocol_selections BEGIN SELECT RAISE(ABORT,'Protocol selection is protected'); END;
+PRAGMA user_version=4;
+COMMIT;
