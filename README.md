@@ -97,3 +97,13 @@ npm --prefix apps/builder start
 尚未实现 M3 自动修复、多租户 / 账户系统、匿名公开生成或长期容量保证。Provider 曾出现响应头正常而正文超时，仍可能影响生成可用性；不以 HTTP 200 或局部测试 PASS 宣称完整成功。
 
 源码布局和交付范围见 [交付概览](docs/Submission-Overview.md)。[冻结 v0.1 设计基线](docs/Mini-Atoms-v0.1-FROZEN-Design-Guide.md)按原字节保留，其中的阶段状态和内部证据引用是当时的历史上下文。
+
+## Copyright and Usage
+
+Copyright © 2026 GotoMiyuki. All rights reserved.
+
+This repository is publicly available for technical review and demonstration purposes.
+
+No open-source license is granted. Except where permitted by applicable law or third-party licenses, reproduction, modification, redistribution, or commercial use of the original project materials requires prior written permission from the respective rights holders.
+
+Third-party components remain subject to their respective licenses.
